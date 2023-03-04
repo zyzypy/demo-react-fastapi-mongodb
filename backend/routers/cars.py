@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from pydantic import Required
 from fastapi import APIRouter, Request, Body, status
 from fastapi.encoders import jsonable_encoder
@@ -41,17 +41,17 @@ async def list_cars(request: Request,
                     # brand: Optional[str] = None
                     brand: str | None = None,
                     page: int = 1,
+                    page_size: int = 25,
                     ) -> List[CarSave]:
-    PER_PAGE = 25
-    skip = (page-1)*PER_PAGE
+    skip = (page-1)*page_size
 
     query = {'price': {'$lt': max_price, '$gt': min_price}}
     if brand:
         query['brand'] = brand
 
-    full_query = request.app.db['cars'].find(query).sort('_id', 1).skip(skip).limit(PER_PAGE)
-    # for car in full_query:
-    #     print(car)
+    full_query = request.app.db['cars'].find(query).sort('_id', 1).skip(skip).limit(page_size)
+    # return [CarBase(**{'_id':'63d115eeb38f6b8206acf9df', 'brand': 'Fiat', 'make': 'Doblo', 'year': 2016, 'price': 7300,
+    #      'km': 134000, 'cm3': 1248})]
     results = [CarSave(**car) for car in full_query]
     return results
 
