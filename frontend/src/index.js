@@ -8,7 +8,7 @@ import Cars from './pages/Cars'
 import Car from './pages/Car'
 import NewCar from './pages/NewCar'
 
-import App from './App.js';
+// import App from './App.js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,10 +16,10 @@ root.render(
     {/* BrowserRouter  http://abc.com/cars   HashRouter  http://abc.com/#/cars  */}
     <BrowserRouter>
     <Routes>
-      <Route path="/" element={<App/>} />
+      <Route path="/" element={<Cars/>} />
       <Route path="/cars" element={<Cars/>} />
-      <Route path="/cars/:id" element={<Car/>} />
-      <Route path="/cars/new" element={<NewCar/>} />
+      <Route path="/cars/:_id" element={<Car/>} />
+      <Route path="/new" element={<NewCar/>} />
       {/*<Route path="/about" element={<About/>} />*/}
     </Routes>
     </BrowserRouter>

@@ -39,9 +39,9 @@ async def list_cars(request: Request,
                     max_price: int = 100000,
                     # Optional is depreciated  https://fastapi.tiangolo.com/python-types/?h=optional#using-union-or-optional
                     # brand: Optional[str] = None
-                    brand: str | None = None,
+                    brand: str | None = '',
                     page: int = 1,
-                    page_size: int = 25,
+                    page_size: int = 20,
                     ) -> List[CarSave]:
     skip = (page-1)*page_size
 
@@ -49,7 +49,7 @@ async def list_cars(request: Request,
     if brand:
         query['brand'] = brand
 
-    full_query = request.app.db['cars'].find(query).sort('_id', 1).skip(skip).limit(page_size)
+    full_query = request.app.db['cars'].find(query).sort([('_id', 1), ('year', 1), ]).skip(skip).limit(page_size)
     # return [CarBase(**{'_id':'63d115eeb38f6b8206acf9df', 'brand': 'Fiat', 'make': 'Doblo', 'year': 2016, 'price': 7300,
     #      'km': 134000, 'cm3': 1248})]
     results = [CarSave(**car) for car in full_query]
