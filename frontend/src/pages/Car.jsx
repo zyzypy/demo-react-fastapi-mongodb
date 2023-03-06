@@ -52,7 +52,9 @@ const Car = () => {
       setError(errArray)
     } else {
       setError([])
-    } navigate('/cars')
+      navigate('/cars')
+      alert('updated')
+    }
   }
   
   const deleteCar = async () => {

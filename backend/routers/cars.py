@@ -4,7 +4,7 @@ from fastapi import APIRouter, Request, Body, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
-from bson.json_util import dumps, ObjectId
+from bson.json_util import dumps as bson_dumps, ObjectId
 from models import CarBase, CarSave, CarUpdate
 
 
@@ -49,7 +49,7 @@ async def list_cars(request: Request,
     if brand:
         query['brand'] = brand
 
-    full_query = request.app.db['cars'].find(query).sort([('_id', 1), ('year', 1), ]).skip(skip).limit(page_size)
+    full_query = request.app.db['cars'].find(query).sort([('_id', -1), ('year', -1), ]).skip(skip).limit(page_size)
     # return [CarBase(**{'_id':'63d115eeb38f6b8206acf9df', 'brand': 'Fiat', 'make': 'Doblo', 'year': 2016, 'price': 7300,
     #      'km': 134000, 'cm3': 1248})]
     results = [CarSave(**car) for car in full_query]
@@ -71,11 +71,12 @@ async def get_car(id: str,
 @router.post('/', description="Add a new car")
 async def create_car(request: Request, car: CarBase = Body(...)):
     car = jsonable_encoder(car)
+    car['_id'] = ObjectId(car['_id'])
     new_car = request.app.db['cars'].insert_one(car)
     created_car = request.app.db['cars'].find_one(
         {'_id': new_car.inserted_id}
     )
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=dumps(created_car))
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=bson_dumps(created_car))
 
 
 # replace put, partially update patch

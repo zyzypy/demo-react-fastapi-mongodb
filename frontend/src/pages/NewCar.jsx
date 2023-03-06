@@ -95,6 +95,7 @@ const NewCar = () => {
     } else {
       setError([])
       navigate('/cars')
+      alert('created')
     }
   }
   

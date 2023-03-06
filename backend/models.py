@@ -28,7 +28,7 @@ class CarBase(BaseModel):
     # brand: Optional[str]
     brand: str = Field(..., title="brand", description="description of brand", min_length=2)
     make: str = Field(Required)
-    year: int
+    year: int = Field(..., gt=1000, lt=3000)
     price: int
     km: int
     cm3: int
