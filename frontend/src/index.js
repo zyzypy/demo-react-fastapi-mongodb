@@ -18,7 +18,7 @@ root.render(
     <Routes>
       <Route path="/" element={<Cars/>} />
       <Route path="/cars" element={<Cars/>} />
-      <Route path="/cars/:_id" element={<Car/>} />
+      <Route path="/cars/:id" element={<Car/>} />
       <Route path="/new" element={<NewCar/>} />
       {/*<Route path="/about" element={<About/>} />*/}
     </Routes>

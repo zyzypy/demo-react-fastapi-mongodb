@@ -44,7 +44,8 @@ class CarSave(CarBase):
     pass
 
 
-class CarUpdate(CarBase):
+class CarUpdate(BaseModel):
+    # for receive request json body, str
     price: int | None
 
 

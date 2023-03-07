@@ -33,7 +33,7 @@ router = APIRouter()
 
 
 # https://restfulapi.net/resource-naming/   I often entangle with naming before, it's right now with the conventions..
-@router.get("/", description="List all cars", response_description="response_description")
+@router.get('/', description="List all cars", response_description="response_description")
 async def list_cars(request: Request,
                     min_price: int = 0,
                     max_price: int = 100000,
@@ -56,7 +56,19 @@ async def list_cars(request: Request,
     return results
 
 
-@router.post("/", description="Add a new car")
+@router.get('/{id}', description="Get a car")
+async def get_car(id: str,
+                  request: Request
+                  ):
+    query = {'_id': ObjectId(id)}
+    car = request.app.db['cars'].find_one(query)
+    if car:
+        return CarBase(**car)
+    else:
+        raise HTTPException(status_code=404, detail=f'can not find car {id}')
+
+
+@router.post('/', description="Add a new car")
 async def create_car(request: Request, car: CarBase = Body(...)):
     car = jsonable_encoder(car)
     new_car = request.app.db['cars'].insert_one(car)
@@ -68,25 +80,26 @@ async def create_car(request: Request, car: CarBase = Body(...)):
 
 # replace put, partially update patch
 # str(ObjectId('58c8979e0da3ef6363ccb8de'))
-@router.patch("/{_id}",
+@router.patch('/{id}',
               description="Update car price")
-def update_car(_id: str,
+def update_car(id: str,
                request: Request,
                # Body() https://stackoverflow.com/questions/56996170/what-is-body-from-fastapi-import-body
+               # https://stackoverflow.com/questions/59929028/python-fastapi-error-422-with-post-request-when-sending-json-data
                car: CarUpdate = Body(...)
                ):
     # db.collection.update(<filter>, <update>, <options>)         exclude_unset {id:'abc', price:None} -> {'id':'abc'}
-    request.app.mongodb['cars'].update_one({'_id': _id}, {'$set': car.dict(exclude_unset=True)})
-    if car := request.app.db['cars'].find_one({'_id': _id}):
+    request.app.db['cars'].update_one({'_id': ObjectId(id)}, {'$set': car.dict(exclude_unset=True)})
+    if car := request.app.db['cars'].find_one({'_id': ObjectId(id)}):
         return CarBase(**car)
     else:
-        raise HTTPException(status_code=404, detail=f"Car with {_id} not found")
+        raise HTTPException(status_code=404, detail=f'Car with {id} not found')
 
 
 @router.delete('/{id}', description="delete a car")
 def delete_car(id: str, request: Request):
-    deleted_result = request.app.db['cars'].delete_one({'_id': id})
+    deleted_result = request.app.db['cars'].delete_one({'_id': ObjectId(id)})
     if deleted_result.deleted_count == 1:
-        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
+        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
     else:
-        raise HTTPException(status_code=404, detail=f"Car with {id} not found")
+        raise HTTPException(status_code=404, detail=f'Car with {id} not found')
