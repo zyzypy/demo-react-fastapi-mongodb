@@ -1,44 +1,52 @@
-services:
-  frontend:
-    build:
-      context: frontend
-      target: development
-    ports:
-      - 3000:3000
-    stdin_open: true
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
-    restart: always
-    networks:
-      - react-express
-    depends_on:
-      - backend
+#https://github.com/chupati/farm-part-3/blob/main/docker-compose.yml
+#https://blog.csdn.net/Gf19991225/article/details/121981918
+#https://docs.docker.com/compose/compose-file/
+#https://www.erraticbits.ca/post/2021/fastapi/
 
-  backend:
-    restart: always
-    build:
-      context: backend
-      target: development
-    volumes:
-      - ./backend:/usr/src/app
-      - /usr/src/app/node_modules
-    depends_on:
-      - mongo
-    networks:
-      - express-mongo
-      - react-express
-    expose:
-      - 3000
+version: "3.9"
+
+name: "demo-farm"
+
+services:
   mongo:
-    restart: always
-    image: mongo:4.2.0
-    volumes:
-      - ./data:/data/db
-    networks:
-      - express-mongo
+    build:
+      context: ./db
     expose:
       - 27017
-networks:
-  react-express:
-  express-mongo:
+    ports:
+      - "27017:27017"
+
+
+  fastapi:
+    depends_on:
+      - mongo
+    build:
+      context: ./backend
+    expose:
+      - 8000
+    ports:
+      - "8000:8000"
+    environment:
+      # access to other container network via db container name, docker network automatically DNS.
+      - "DATABASE_HOST=mongo"
+
+
+  react:
+    depends_on:
+      - fastapi
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    # todo Can't connect to fastapi container via container name, but fastapi can connect to mongo. I want to only expose react port.
+    # ! environment REACT_APP_API_HOST=fastAPI must be set before build,
+    # either in .env file or in Dockerfile before build.
+    # environment:
+    #   - "REACT_APP_API_HOST=fastapi"
+    # ! Entrypoint of this whole project,
+    # set "<your_port>:3000"
+    ports:
+      - "3000:3000"
+
+
+#networks:
+#  demo-farm:

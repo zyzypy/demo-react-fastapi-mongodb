@@ -1,8 +1,8 @@
 import uvicorn
-from dotenv import load_dotenv, dotenv_values
 from pymongo import MongoClient
 from fastapi import FastAPI, Request, Body, status
 from fastapi.middleware.cors import CORSMiddleware
+from config import MONGO
 
 from routers.cars import router as cars_router
 
@@ -12,16 +12,15 @@ app = FastAPI()
 # Router first level registration
 app.include_router(cars_router, prefix="/cars", tags=["cars"])
 
-# Load config. not elegant verses django.  I don't like .env file
-config = dotenv_values('.env')
 # CORS
+# https://www.w3cschool.cn/fastapi/fastapi-1ewy3ld2.html
 origins = [
-    'http://localhost',
-    'http://localhost:3000',
+    'http://0.0.0.0',
+    'http://0.0.0.0:3000',
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=['*'],
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
@@ -30,9 +29,9 @@ app.add_middleware(
 # database connection handler.  haven't found a connection pool solution
 @app.on_event('startup')
 def start_db_client():
-    app.mongo_client = MongoClient(config['DB_URL'])
+    app.mongo_client = MongoClient(f"mongodb://{MONGO['HOST']}:{MONGO['PORT']}/{MONGO['DBNAME']}")
     # usage: request.app.db['collection_name'].find(query).sort()
-    app.db = app.mongo_client.get_database(config['DB_NAME'])
+    app.db = app.mongo_client.get_database(MONGO['DBNAME'])
 
 
 @app.on_event('shutdown')
@@ -42,5 +41,6 @@ def shutdown_db_client():
 
 
 if __name__ == '__main__':
+    # terminal> uvicorn app:app --host 0.0.0.0 --port 8000 --log-level=debug
     # testing server
-    uvicorn.run(app="app:app", reload=True, port=8000, log_level='debug')
+    uvicorn.run(app="app:app", reload=True, host='127.0.0.1', port=8000, log_level='debug')

@@ -20,7 +20,6 @@ root.render(
       <Route path="/cars" element={<Cars/>} />
       <Route path="/cars/:id" element={<Car/>} />
       <Route path="/new" element={<NewCar/>} />
-      {/*<Route path="/about" element={<About/>} />*/}
     </Routes>
     </BrowserRouter>
   </React.StrictMode>

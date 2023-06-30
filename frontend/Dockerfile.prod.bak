@@ -1,0 +1,35 @@
+#https://mherman.org/blog/dockerizing-a-react-app/
+#https://www.cnblogs.com/leoyang63/articles/13733967.html
+#https://docs.docker.com/build/building/multi-stage/
+
+
+FROM node:18.16-alpine as builder
+
+WORKDIR /App/demo-farm/frontend
+
+ENV PATH=/App/demo-farm/frontend/node_modules/.bin:$PATH
+ENV NODE_ENV=production
+ENV REACT_APP_API_HOST=fastapi
+
+COPY package.json ./package.json
+COPY package-lock.json ./package-lock.json
+RUN npm ci
+
+COPY . .
+
+EXPOSE 3000
+RUN npm run build
+
+
+# Caddy is similar to Nginx, configures simply in simple scenes.
+FROM caddy:2.6-alpine
+
+WORKDIR /App/demo-farm/frontend/build
+
+# create-react project build output folder is 'build' not 'dist'
+COPY --from=builder /App/demo-farm/frontend/build ./
+# Different from Caddy which direct in OS, /etc/caddy/Caddyfile will overwrite default config file
+# and automatically convert to json format config file.
+COPY Caddyfile /etc/caddy/Caddyfile
+
+EXPOSE 3000

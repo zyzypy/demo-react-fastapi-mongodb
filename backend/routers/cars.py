@@ -2,7 +2,7 @@ from typing import List, Optional, Any
 from pydantic import Required
 from fastapi import APIRouter, Request, Body, status
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.exceptions import HTTPException
 from bson.json_util import dumps as bson_dumps, ObjectId
 from models import CarBase, CarSave, CarUpdate
@@ -101,6 +101,6 @@ def update_car(id: str,
 def delete_car(id: str, request: Request):
     deleted_result = request.app.db['cars'].delete_one({'_id': ObjectId(id)})
     if deleted_result.deleted_count == 1:
-        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)     # 204, can't use with JSONResponse
     else:
         raise HTTPException(status_code=404, detail=f'Car with {id} not found')

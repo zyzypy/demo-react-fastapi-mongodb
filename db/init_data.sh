@@ -1,0 +1,1 @@
+mongoimport --db=local --collection=cars --type=csv --headerline --file=/App/tmp/cars_data.csv

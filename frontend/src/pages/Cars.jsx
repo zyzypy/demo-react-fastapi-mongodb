@@ -2,9 +2,12 @@ import {useState, useEffect} from "react";
 
 import Layout from "../components/Layout";
 import Card from "../components/Card"
+import {API_BASE_URL} from "../config";
 
 
-let BASE_URL = 'http://127.0.0.1:8000'
+console.log('process.env:', process.env)
+console.log('API_BASE_URL:', API_BASE_URL)
+
 
 const Cars = () => {
   const [cars, setCars] = useState([])
@@ -38,14 +41,13 @@ const Cars = () => {
     setPage(e.target.value)
   }
   
-  
+  // Get cars info
   // another writing approach async/await
   useEffect(()=>{
-    fetch(`${BASE_URL}/cars/`+
+    fetch(`${API_BASE_URL}/cars/`+
       `?brand=${brand}&min_price=${min_price}&max_price=${max_price}&page=${page}`, {
       method: 'GET'
-    })
-      .then(response=>response.json())
+    }).then(response=>response.json())
       .then(json=>{
         console.log(json)
         setCars(json)

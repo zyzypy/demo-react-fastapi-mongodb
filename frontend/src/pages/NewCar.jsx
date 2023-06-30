@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom'
 
 import Layout from "../components/Layout";
 import FormInput from "../components/FormInput";
+import {API_BASE_URL} from "../config";
 
 const NewCar = () => {
   // car structure
@@ -78,7 +79,7 @@ const NewCar = () => {
   // http request
   const addCar = async (newCar) => {
     const response =
-      await fetch(`http://localhost:8000/cars`, {
+      await fetch(`${API_BASE_URL}/cars`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

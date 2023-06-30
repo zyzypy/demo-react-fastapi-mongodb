@@ -1,4 +1,5 @@
 import {Link, NavLink} from "react-router-dom";
+import {API_BASE_URL} from "../config";
 
 const Header = () => {
   // I don't like over flexible writing approaches in js https://stackoverflow.com/questions/52562134/why-can-i-omit-the-return-statement-with-parenthesis-in-react
@@ -14,7 +15,7 @@ const Header = () => {
         <NavLink className={ ({isActive}) => isActive ? "active-link  text-yellow-500": "" }
                  to="/new">NewCar</NavLink><span>/</span>
         <NavLink className={ ({isActive}) => isActive ? "active-link  text-yellow-500": "" }
-                 to="http://localhost:8000/docs" target="_blank">Docs</NavLink>
+                 to={API_BASE_URL+"/docs"} target="_blank">Docs</NavLink>
       </div>
     </nav>
   )

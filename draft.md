@@ -41,14 +41,16 @@ COPY package.json
 cnpm install
 
 
-
-
-
-
-
 ## MongoDB
 docker run --name "mongo" -d -p 27017:27017 mongo:6.0.3
 docker run --name "mongo-express" -it --rm -p 8081:8081 --link mongo:mongo mongo-express
 
 To import csv data, docker run -v/shell mongoimport -f/build a new image with COPY command/ would be troublesome.
  GUI is convenience, but only mongo-compass(not datagrip,not mongo-express) support importing csv file and automatically determining field type.
+
+
+## docker compose
+docker compose up --build --no-cache --remove-orphans
+               down
+               build <service1>
+               restart <service1>

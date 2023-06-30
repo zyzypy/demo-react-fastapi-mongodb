@@ -3,6 +3,7 @@ import {useParams, useNavigate} from "react-router-dom";
 
 import Layout from "../components/Layout";
 import FormInput from "../components/FormInput";
+import {API_BASE_URL} from "../config";
 
 
 const Car = () => {
@@ -20,9 +21,10 @@ const Car = () => {
   }
   
   
+  // Get single car info
   // http get single car; update price field; delete
-  const getCar = async() => {
-    const res = await fetch(`http://localhost:8000/cars/${id}`)
+  const getCar = async () => {
+    const res = await fetch(`${API_BASE_URL}/cars/${id}`)
     if (!res.ok) {
       setError('Error fetching car')
     } else {
@@ -35,8 +37,9 @@ const Car = () => {
   }
   
   
+  // Update price of a car
   const updatePrice = async ()=> {
-    const res = await fetch(`http://localhost:8000/cars/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/cars/${id}`, {
       method: 'PATCH',  // partial update
       headers:{
         // default text/plain will encode body to bytes, can't pass backend pydantic model validation
@@ -58,7 +61,7 @@ const Car = () => {
   }
   
   const deleteCar = async () => {
-    const res = await fetch(`http://localhost:8000/cars/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/cars/${id}`, {
       method: 'DELETE',
       headers: {'Content-Type': 'application/json'}
     })
@@ -75,7 +78,7 @@ const Car = () => {
     }
   }
   
-  // onload
+  // execute once when component loads, [] can't delete
   useEffect(() => {
     getCar().then().then()
   }, [])
