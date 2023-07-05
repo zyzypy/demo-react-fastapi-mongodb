@@ -3,6 +3,9 @@
 #https://docs.docker.com/compose/compose-file/
 #https://www.erraticbits.ca/post/2021/fastapi/
 
+# todo COPY code=>volume mapping, it's slow in MacOS docker desktop, cache isn't effective.
+# todo ws connection error in cloud server. https://it.cha138.com/wen2/show-3593816.html   should build
+
 version: "3.9"
 
 name: "demo-farm"
@@ -32,19 +35,20 @@ services:
 
 
   react:
+    restart: always
     depends_on:
       - fastapi
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    # todo Can't connect to fastapi container via container name, but fastapi can connect to mongo. I want to only expose react port.
-    # ! environment REACT_APP_API_HOST=fastAPI must be set before build,
-    # either in .env file or in Dockerfile before build.
-    # environment:
-    #   - "REACT_APP_API_HOST=fastapi"
-    # ! Entrypoint of this whole project,
-    # set "<your_port>:3000"
+    environment:
+      # ! when production, set it as subdomains name in reverse software.
+      - "NODE_ENV=production"
+      - "REACT_APP_API_HTTP=https"
+      - "REACT_APP_API_PORT=443"
+      - "REACT_APP_API_HOST=demo-farm-fastapi.zyzypy.com"
     ports:
+      # ! Entrypoint of this whole project,
       - "3000:3000"
 
 
